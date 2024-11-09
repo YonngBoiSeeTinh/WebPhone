@@ -74,7 +74,7 @@ const updateProductStock = async (id, color, amount) => {
         if (amount > colorItem.countInstock) {
             return {
                 status: 'ERR',
-                message: 'Số lượng vượt quá tồn kho',
+                message: 'Insufficient stock for the selected color',
             };
         }
         // Update the countInStock for the specified color

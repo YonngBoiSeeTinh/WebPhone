@@ -2,7 +2,7 @@ import React,{useState, useEffect, useContext} from "react";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '../../Pagination'
-import { FilterContext } from '../EmployeeLayout';
+import { FilterContext } from '../AdminLayout';
 const OrderAccept = ({setAlertMessage,setShowAlert, setType}) => {
   const { filter } = useContext(FilterContext);
   const fetchApi = async () => {
@@ -67,39 +67,50 @@ const OrderAccept = ({setAlertMessage,setShowAlert, setType}) => {
     const Product = listProduct.filter((item)=>item._id === ProductId)
     return Product[0]
   }
-  const handleClickAccept = (order) => {
-    handleAcceptOrder(order);
+  const handleClickAccept = (orderId) => {
+    handleAcceptOrder(orderId);
   };
 
+  
   const handleAcceptOrder = async (order) => {
     try {
-      
-      
-      //Cập nhật trạng thái đơn hàng
-      const res = await axios.put(`http://localhost:3001/api/order/update/${order?._id}`, {
-        isPaid: true 
-      });
-  
-      if (res.status === 200) { // Kiểm tra phản hồi chính xác từ API
-        // Cập nhật lại số lượng tồn kho cho sản phẩm
-        await axios.put(`http://localhost:3001/api/product/updateStock/${order?.productId}`, {
-          color: order?.color,
-          amount: order?.amount});
-          if (res.status === 200) {
-            setAlertMessage("Xác nhận đơn hàng thành công");
-            refetch();
-            setType("success");
+        // Update the stock quantity for the product first
+        const stockRes = await axios.put(`http://localhost:3001/api/product/updateStock/${order?.productId}`, {
+            color: order?.color,
+            amount: order?.amount
+        });
+        console.log(stockRes);
+
+        if (stockRes.status === 200) {
+            // If stock update is successful, proceed to update the order status
+            const res = await axios.put(`http://localhost:3001/api/order/update/${order?._id}`, {
+                isPaid: true 
+            });
+
+            if (res.status === 200) {
+                setAlertMessage("Xác nhận đơn hàng thành công");
+                refetch();
+                setType("success");
+                setShowAlert(true);
+                return res.data.data;
+            } else {
+                setAlertMessage("Lỗi cập nhật trạng thái đơn hàng");
+                setType("danger");
+                setShowAlert(true);
+            }
+        } else {
+            setAlertMessage("Lỗi cập nhật tồn kho");
+            setType("danger");
             setShowAlert(true);
-          }
-        return res.data.data;
-      }
+        }
     } catch (error) {
-      setAlertMessage('Error updating order:', error.message);
-      setType("danger");
-      setShowAlert(true);
-      throw error;
+      console.log(error);
+        setAlertMessage(`Lỗi: ${error.message}`);
+        setType("danger");
+        setShowAlert(true);
     }
-  };
+};
+
   
   const handleDeleteOrder =async(id)=>{
     try {

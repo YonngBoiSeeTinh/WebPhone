@@ -52,30 +52,15 @@ const updateProduct = async (id, updatedData) => {
         };
     }
 };
-const updateProductStock = async (id, color, amount) => {
+const updateProductStock = async (productId, color, amount) => {
     try {
-        const product = await Product.findById(id);
+        const product = await Product.findById(productId);
         // Check if the product exists
         if (!product) {
-            return {
+            return res.status(404).json({
                 status: 'ERR',
                 message: 'Product not found',
-            };
-        }
-        const colorItem = product.colors.find(item => item.color === color);
-        if (!colorItem) {
-            return {
-                status: 'ERR',
-                message: 'Color not found in product',
-            };
-        }
-
-        // Check if amount exceeds the countInStock
-        if (amount > colorItem.countInstock) {
-            return {
-                status: 'ERR',
-                message: 'Số lượng vượt quá tồn kho',
-            };
+            });
         }
         // Update the countInStock for the specified color
         const updatedColors = product.colors.map((colorItem) => {
@@ -88,17 +73,17 @@ const updateProductStock = async (id, color, amount) => {
         product.colors = updatedColors;
         await product.save();
 
-        return {
+        return res.status(200).json({
             status: 'OK',
             message: 'Product stock updated successfully',
             data: product,
-        };
+        });
     } catch (error) {
-        return {
+        return res.status(500).json({
             status: 'ERROR',
             message: 'Internal server error',
             err: error.message,
-        };
+        });
     }
 };
 

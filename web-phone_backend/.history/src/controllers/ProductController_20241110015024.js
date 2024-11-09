@@ -28,8 +28,7 @@ const updateProduct = async (req, res) => {
     }
 };
 const updateProductStock  = async (req, res) => {
-    const { id } = req.params; // Lấy productId từ params
-    console.log(id)
+    const { id } = req.params; // Lấy ID từ params
     const { color, amount } = req.body;
     try {
         const response = await ProductService.updateProductStock(id,color, amount);

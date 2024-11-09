@@ -28,11 +28,11 @@ const updateProduct = async (req, res) => {
     }
 };
 const updateProductStock  = async (req, res) => {
-    const { id } = req.params; // Lấy productId từ params
-    console.log(id)
+    const { productId } = req.params; // Lấy productId từ params
+    console.log(productId)
     const { color, amount } = req.body;
     try {
-        const response = await ProductService.updateProductStock(id,color, amount);
+        const response = await ProductService.updateProductStock(productId,color, amount);
         return res.status(response.status === 'OK' ? 200 : 400).json(response);
     } catch (error) {
         return res.status(500).json({

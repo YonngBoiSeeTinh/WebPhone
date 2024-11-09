@@ -2,7 +2,7 @@ import React,{useState, useEffect, useContext} from "react";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '../../Pagination'
-import { FilterContext } from '../EmployeeLayout';
+import { FilterContext } from '../AdminLayout';
 const OrderAccept = ({setAlertMessage,setShowAlert, setType}) => {
   const { filter } = useContext(FilterContext);
   const fetchApi = async () => {
@@ -67,10 +67,11 @@ const OrderAccept = ({setAlertMessage,setShowAlert, setType}) => {
     const Product = listProduct.filter((item)=>item._id === ProductId)
     return Product[0]
   }
-  const handleClickAccept = (order) => {
-    handleAcceptOrder(order);
+  const handleClickAccept = (orderId) => {
+    handleAcceptOrder(orderId);
   };
 
+  
   const handleAcceptOrder = async (order) => {
     try {
       

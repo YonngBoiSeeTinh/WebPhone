@@ -9,7 +9,7 @@ import Order from "../../Order/Order";
 function UserPage({ setAlertMessage,setShowAlert, setType }) {
     const location = useLocation()
     const user = location.state.user;
- 
+   console.log(user);
     
     const fetchApiOrder = async () => {
         try {

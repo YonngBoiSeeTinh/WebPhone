@@ -2,7 +2,7 @@ import React,{useState, useEffect, useContext} from "react";
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import Pagination from '../../Pagination'
-import { FilterContext } from '../EmployeeLayout';
+import { FilterContext } from '../AdminLayout';
 const OrderAccept = ({setAlertMessage,setShowAlert, setType}) => {
   const { filter } = useContext(FilterContext);
   const fetchApi = async () => {
@@ -67,32 +67,67 @@ const OrderAccept = ({setAlertMessage,setShowAlert, setType}) => {
     const Product = listProduct.filter((item)=>item._id === ProductId)
     return Product[0]
   }
-  const handleClickAccept = (order) => {
-    handleAcceptOrder(order);
+  const handleClickAccept = (orderId) => {
+    handleAcceptOrder(orderId);
   };
 
+  const updateProductApi = async (productId, updatedData) => {
+    try {
+      const response = await axios.put(`http://localhost:3001/api/product/update/${productId}`, updatedData);
+      return response.data;
+    } catch (error) {
+      console.error("Error updating product:", error);
+      throw error;
+    }
+  };
+  
+  const handleUpdateProductStock = async (productId, color, amount) => {
+    try {
+      // Lấy dữ liệu sản phẩm hiện tại để cập nhật
+      const product = await axios.get(`http://localhost:3001/api/product/getDetail/${productId}`);
+      console.log('updatedColors',product);
+      const updatedColors = product.data.colors.map((colorItem) => {
+        if (colorItem.color === color) {
+          return { ...colorItem, countInstock: colorItem.countInstock - amount };
+        }
+        return colorItem;
+      });
+     
+  
+      // Gọi API cập nhật sản phẩm với mảng colors đã cập nhật
+      const updatedData = { colors: updatedColors };
+      const result = await updateProductApi(productId, updatedData);
+  
+      if (result.status === 'OK') {
+        console.log("Sản phẩm đã được cập nhật thành công!");
+        // Thực hiện các hành động cần thiết sau khi cập nhật thành công
+      } else {
+        console.error("Cập nhật sản phẩm thất bại.");
+      }
+    } catch (error) {
+      console.error("Error updating product stock:", error);
+    }
+  };
+  
   const handleAcceptOrder = async (order) => {
     try {
+      await handleUpdateProductStock(order?.productId, order?.color, order?.amount);
       
-      
-      //Cập nhật trạng thái đơn hàng
-      const res = await axios.put(`http://localhost:3001/api/order/update/${order?._id}`, {
-        isPaid: true 
-      });
+      // Cập nhật trạng thái đơn hàng
+      // const res = await axios.put(`http://localhost:3001/api/order/update/${order?._id}`, {
+      //   isPaid: true 
+      // });
   
-      if (res.status === 200) { // Kiểm tra phản hồi chính xác từ API
-        // Cập nhật lại số lượng tồn kho cho sản phẩm
-        await axios.put(`http://localhost:3001/api/product/updateStock/${order?.productId}`, {
-          color: order?.color,
-          amount: order?.amount});
-          if (res.status === 200) {
-            setAlertMessage("Xác nhận đơn hàng thành công");
-            refetch();
-            setType("success");
-            setShowAlert(true);
-          }
-        return res.data.data;
-      }
+      // if (res.status === 200) { // Kiểm tra phản hồi chính xác từ API
+      //   // Cập nhật lại số lượng tồn kho cho sản phẩm
+      //   await handleUpdateProductStock(order?.productId, order?.color, order?.amount);
+  
+      //   setAlertMessage("Xác nhận đơn hàng thành công");
+      //   refetch();
+      //   setType("success");
+      //   setShowAlert(true);
+      //   return res.data.data;
+      // }
     } catch (error) {
       setAlertMessage('Error updating order:', error.message);
       setType("danger");

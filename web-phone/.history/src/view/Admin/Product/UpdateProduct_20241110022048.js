@@ -17,7 +17,12 @@ function UpdateProduct({setAlertMessage,setShowAlert, setType}) {
 
   
     const [product, setProduct] = useState(location.state || {});
-
+    useEffect(() => {
+        if (query.data) {
+            setProduct(query.data);
+        }
+    }, [query.data]);
+   
 
     // Kiểm tra nếu sản phẩm không tồn tại
     if (!product) {

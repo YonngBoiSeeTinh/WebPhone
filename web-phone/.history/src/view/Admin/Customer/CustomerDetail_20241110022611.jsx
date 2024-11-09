@@ -9,12 +9,12 @@ import Order from "../../Order/Order";
 function UserPage({ setAlertMessage,setShowAlert, setType }) {
     const location = useLocation()
     const user = location.state.user;
- 
+   
     
     const fetchApiOrder = async () => {
         try {
           const res = await axios.get(`http://localhost:3001/api/order/getByUserId/${user._id}`);
-          console.log('order',res.data.data);
+          console.log(res.data.data);
           return res.data.data;  
         } catch (error) {
           console.error('Error fetching data:', error);

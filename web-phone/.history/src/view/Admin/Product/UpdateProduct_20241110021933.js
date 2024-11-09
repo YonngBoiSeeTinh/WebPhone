@@ -9,14 +9,8 @@ import ProductUpdateForm from "./ProductComnonent/UpdateProduct/ProductUpdateFor
 
 function UpdateProduct({setAlertMessage,setShowAlert, setType}) {
     const location = useLocation();
+    const { product } = location.state || {};
     const [imageLink, setImageLink] = useState('');
-
-    useEffect(() => {
-        window.scrollTo(0, 0);
-    }, []);
-
-  
-    const [product, setProduct] = useState(location.state || {});
 
 
     // Kiểm tra nếu sản phẩm không tồn tại

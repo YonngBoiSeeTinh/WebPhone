@@ -3,21 +3,42 @@ import './ProductDetail.scss'; // Đảm bảo bạn đã tạo và liên kết 
 import axios from 'axios';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'react-router-dom';
-import { useLocation } from 'react-router-dom';
+
 import ProductGallery from "./ProductComnonent/UpdateProduct/ProductGallery";
 import ProductUpdateForm from "./ProductComnonent/UpdateProduct/ProductUpdateForm";
 
 function UpdateProduct({setAlertMessage,setShowAlert, setType}) {
-    const location = useLocation();
+    const { id } = useParams();
+    console.log('proId', id);
     const [imageLink, setImageLink] = useState('');
 
     useEffect(() => {
         window.scrollTo(0, 0);
     }, []);
 
-  
-    const [product, setProduct] = useState(location.state || {});
+    
+    const fetchApi = async () => {
+        try {
+            const res = await axios.get(`http://localhost:3001/api/product/getDetail/${id}`);
+            console.log('API Response:', res.data);
+            return res.data.data[0];
+        } catch (error) {
+            console.error('Error fetching data:', error);
+            throw error;
+        }
+    };
 
+    const query = useQuery({
+        queryKey: ['products', id],
+        queryFn: fetchApi
+    });
+    const [product, setProduct] = useState(null);
+    useEffect(() => {
+        if (query.data) {
+            setProduct(query.data);
+        }
+    }, [query.data]);
+   
 
     // Kiểm tra nếu sản phẩm không tồn tại
     if (!product) {

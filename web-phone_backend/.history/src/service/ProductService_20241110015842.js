@@ -62,21 +62,6 @@ const updateProductStock = async (id, color, amount) => {
                 message: 'Product not found',
             };
         }
-        const colorItem = product.colors.find(item => item.color === color);
-        if (!colorItem) {
-            return {
-                status: 'ERR',
-                message: 'Color not found in product',
-            };
-        }
-
-        // Check if amount exceeds the countInStock
-        if (amount > colorItem.countInstock) {
-            return {
-                status: 'ERR',
-                message: 'Số lượng vượt quá tồn kho',
-            };
-        }
         // Update the countInStock for the specified color
         const updatedColors = product.colors.map((colorItem) => {
             if (colorItem.color === color) {
